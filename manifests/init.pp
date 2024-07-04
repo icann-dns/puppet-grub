@@ -3,51 +3,47 @@
 # @param protect_boot protect boot
 # @param protect_advanced protect advanced options
 # @param user the username to user
-# @param the password to use
+# @param password the password to use
+# @param menuentries custom text to add to the menu
 class grub (
-  Boolean             $protect_boot     = false,
-  Boolean             $protect_advanced = false,
-  Optional[String]    $user             = undef,
-  Optional[String]    $password         = undef,
-  Optional[String[1]] $custom_content   = undef,
+  Boolean                          $protect_boot     = false,
+  Boolean                          $protect_advanced = false,
+  Optional[String[1]]              $user             = undef,
+  Optional[String[1]]              $password         = undef,
+  Hash[String[1], Grub::Menuentry] $menuentries      = {},
 ) {
-  if $custom_source and $custom_content {
-    fail('you can only provide one of `custom_source` or `custom_content`')
-  }
-  $_custom_content = @("CUSTOM"\L)
-  #!/bin/sh
-  exec tail -n +3 $0
-  ${custom_content},
-  | CUSTOM
+  $custom_menus = grub::parse_menuentries($menuentries)
+  $_custom_content = @("CUSTOM"/$)
+    #!/bin/sh
+    exec tail -n +3 \$0
+    ${custom_menus}
+    | CUSTOM
+  $super_content = @("CONTENT")
+    /bin/cat << EOF
+    set superusers="${user}"
+    password_pbkdf2 ${user} ${password}
+    export superusers
+    EOF
+    | CONTENT
 
-  exec {'update_grub':
+  exec { 'update_grub':
     command     => '/usr/sbin/update-grub',
     refreshonly => true,
   }
   file {
     default:
-      notify  => Exec['update_grub'],
+      ensure => file,
       mode   => '0755',
-      ensure  => file;
+      notify => Exec['update_grub'];
     '/etc/default/grub':
-      mode   => '0644',
+      mode    => '0644',
       content => template('grub/etc/default/grub.erb');
+    '/etc/grub.d/01_superuser':
+      ensure  => stdlib::ensure($user and $password, 'file'),
+      content => $super_content;
     '/etc/grub.d/10_linux':
-      content => template('grub/etc/grub.d/10_linux.erb'),
+      content => template('grub/etc/grub.d/10_linux.erb');
     '/etc/grub.d/40_custom':
-      content => $_custom_content,
-  }
-  if $user and $password {
-    file { '/etc/grub.d/01_superuser':
-      ensure  => file,
-      mode    => '0755',
-      content => "/bin/cat << EOF\nset superusers=\"${user}\"\npassword_pbkdf2 ${user} ${password}\nexport superusers\nEOF\n",
-      notify  => Exec['update_grub'],
-    }
-  } else {
-    file { '/etc/grub.d/01_superuser':
-      ensure => absent,
-      notify => Exec['update_grub'],
-    }
+      content => $_custom_content;
   }
 }
