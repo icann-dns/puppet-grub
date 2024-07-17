@@ -1,6 +1,6 @@
 {
   "name": "icann-grub",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "john.bond@icann.org",
   "summary": "small modules to install grub",
   "license": "MPL-2.0",

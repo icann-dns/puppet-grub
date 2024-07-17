@@ -1,3 +1,7 @@
+## 2024-07-17 - Release 0.1.5
+### Summary
+* Fix typo
+
 ## 2024-07-16 - Release 0.1.4
 ### Summary
 * add support for adding custom menu items
