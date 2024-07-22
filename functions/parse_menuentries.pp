@@ -5,9 +5,6 @@ function grub::parse_menuentries (
   Hash[String[1], Grub::Menuentry] $menuentries,
 ) >> Optional[String[1]] {
   $menuentries.map |$title, $config| {
-    $iso_path = ('configfile' in $config).bool2str(
-      "iso_path ${config['configfile']}", ''
-    )
     $configfile = ('configfile' in $config).bool2str(
       "configfile ${config['configfile']}", ''
     )
@@ -20,7 +17,7 @@ function grub::parse_menuentries (
     )
     $loop_lines = 'iso_path' in $config ? {
       true => [
-        "iso_path ${config['configfile']}",
+        "set iso_path=${config['iso_path']}",
         'loopback loop "$iso_path"',
         'root=(loop)',
       ],
