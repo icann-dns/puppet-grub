@@ -1,3 +1,7 @@
+## 2024-07-22 - Release 0.1.6
+### Summary
+* Actually set the iso\_path
+
 ## 2024-07-17 - Release 0.1.5
 ### Summary
 * Fix typo
