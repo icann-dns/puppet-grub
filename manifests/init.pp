@@ -2,15 +2,21 @@
 #
 # @param protect_boot protect boot
 # @param protect_advanced protect advanced options
+# @param timeout how long to show the grub menu
+# @param default the default boot entry
 # @param user the username to user
 # @param password the password to use
+# @param extra_mods a list of additional modules to install
 # @param menuentries custom text to add to the menu
 class grub (
-  Boolean                          $protect_boot     = false,
-  Boolean                          $protect_advanced = false,
-  Optional[String[1]]              $user             = undef,
-  Optional[String[1]]              $password         = undef,
-  Hash[String[1], Grub::Menuentry] $menuentries      = {},
+  Boolean                            $protect_boot     = false,
+  Boolean                            $protect_advanced = false,
+  Integer[1,60]                      $timeout          = 3,
+  Variant[Enum['saved'], Integer[0]] $default          = 0,
+  Optional[String[1]]                $user             = undef,
+  Optional[String[1]]                $password         = undef,
+  Array[String[1]]                   $extra_mods       = [],
+  Hash[String[1], Grub::Menuentry]   $menuentries      = {},
 ) {
   $custom_menus = grub::parse_menuentries($menuentries)
   $_custom_content = @("CUSTOM"/$)
@@ -18,12 +24,12 @@ class grub (
     exec tail -n +3 \$0
     ${custom_menus}
     | CUSTOM
-  $super_content = @("CONTENT")
-    /bin/cat << EOF
+  $super_content = @("CONTENT"/$)
+    #!/bin/sh
+    exec tail -n +3 \$0
     set superusers="${user}"
     password_pbkdf2 ${user} ${password}
     export superusers
-    EOF
     | CONTENT
 
   exec { 'update_grub':
