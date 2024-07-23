@@ -1,3 +1,7 @@
+## 2024-07-23 - Release 0.2.0
+### Summary
+* Add ability to change the default and timeout values
+
 ## 2024-07-22 - Release 0.1.6
 ### Summary
 * Actually set the iso\_path
