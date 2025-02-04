@@ -4,11 +4,11 @@ GRUB_TIMEOUT=<%= @timeout %>
 GRUB_DISTRIBUTOR=`lsb_release -i -s 2> /dev/null || echo Debian`
 GRUB_CMDLINE_LINUX_DEFAULT=""
 <% unless @virtual == "vmware" then -%>
-GRUB_CMDLINE_LINUX="rootdelay=90 apparmor=0 console=tty0 console=ttyS1,115200n8"
+GRUB_CMDLINE_LINUX="rootdelay=90 apparmor=<%= @apparmor %> console=tty0 console=ttyS1,115200n8"
 GRUB_TERMINAL="serial"
 GRUB_SERIAL_COMMAND="serial --speed=115200 --unit=1 --word=8 --parity=no --stop=1"
 <% else -%>
-GRUB_CMDLINE_LINUX="apparmor=0"
+GRUB_CMDLINE_LINUX="apparmor=<%= @apparmor %>"
 GRUB_TERMINAL="console"
 <% end -%>
 <% unless @extra_mods.empty? -%>
