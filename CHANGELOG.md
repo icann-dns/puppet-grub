@@ -1,3 +1,7 @@
+## 2025-02-04 - Release 0.2.1
+### Summary
+* Add ability to toggle apparmor support
+
 ## 2024-07-23 - Release 0.2.0
 ### Summary
 * Add ability to change the default and timeout values
