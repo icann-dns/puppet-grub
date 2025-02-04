@@ -2,6 +2,7 @@
 #
 # @param protect_boot protect boot
 # @param protect_advanced protect advanced options
+# @param enable_apparmor if true enable app armor
 # @param timeout how long to show the grub menu
 # @param default the default boot entry
 # @param user the username to user
@@ -11,6 +12,7 @@
 class grub (
   Boolean                            $protect_boot     = false,
   Boolean                            $protect_advanced = false,
+  Boolean                            $enable_apparmor  = true,
   Integer[1,60]                      $timeout          = 3,
   Variant[Enum['saved'], Integer[0]] $default          = 0,
   Optional[String[1]]                $user             = undef,
@@ -31,6 +33,7 @@ class grub (
     password_pbkdf2 ${user} ${password}
     export superusers
     | CONTENT
+  $apparmor = $enable_apparmor.bool2str('1','0')
 
   exec { 'update_grub':
     command     => '/usr/sbin/update-grub',
